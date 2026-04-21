@@ -543,6 +543,91 @@
     }
   }
 
+  /* ============================================================
+   * 保存结果为图片（手机走原生分享面板 → 可保存到相册 / 发送；桌面直接下载）
+   * ============================================================ */
+  async function saveResultImage() {
+    const btn = $("#save-img-btn");
+    if (btn.dataset.busy === "1") return;
+
+    if (typeof htmlToImage === "undefined") {
+      flashToast("截图组件未加载，检查网络后重试");
+      return;
+    }
+
+    const target = $("#screen-result");
+    const actions = target.querySelector(".actions");
+    const originalLabel = btn.textContent;
+    let actionsPrevDisplay = "";
+
+    btn.dataset.busy = "1";
+    btn.disabled = true;
+    btn.textContent = "生成中…";
+
+    try {
+      try { if (document.fonts && document.fonts.ready) await document.fonts.ready; } catch (_) {}
+
+      if (actions) {
+        actionsPrevDisplay = actions.style.display;
+        actions.style.display = "none";
+      }
+
+      const bg = getComputedStyle(document.body).backgroundColor || "#F2ECDD";
+      const pxRatio = Math.min(window.devicePixelRatio || 1, 2);
+
+      const dataUrl = await htmlToImage.toPng(target, {
+        pixelRatio: pxRatio,
+        backgroundColor: bg,
+        cacheBust: true,
+        style: { transform: "none" }
+      });
+
+      const code = ($("#result-code").textContent || "result").trim().replace(/\s+/g, "");
+      const name = ($("#result-name").textContent || "").trim();
+      const filename = `AI人设-${code}${name ? "-" + name : ""}.png`;
+
+      const blob = await (await fetch(dataUrl)).blob();
+      const file = new File([blob], filename, { type: "image/png" });
+
+      const shareText =
+        "我在 AI 使用人设测试里是「" + code + " · " + name + "」，你是哪种？\n" + location.href;
+
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        try {
+          await navigator.share({
+            files: [file],
+            title: "AI 使用人设测试",
+            text: shareText
+          });
+          flashToast("已打开分享面板，可保存到相册 ✓");
+          return;
+        } catch (err) {
+          if (err && err.name === "AbortError") return;
+        }
+      }
+
+      triggerDownload(dataUrl, filename);
+      flashToast("图片已保存到下载目录 ✓");
+    } catch (err) {
+      console.error(err);
+      flashToast("生成失败，请稍后再试");
+    } finally {
+      if (actions) actions.style.display = actionsPrevDisplay;
+      btn.dataset.busy = "";
+      btn.disabled = false;
+      btn.textContent = originalLabel;
+    }
+  }
+
+  function triggerDownload(dataUrl, filename) {
+    const a = document.createElement("a");
+    a.href = dataUrl;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  }
+
   function flashToast(msg) {
     let t = document.getElementById("toast");
     if (!t) {
@@ -616,6 +701,7 @@
     $("#resume-restart-btn").addEventListener("click", startQuiz);
     $("#q-back").addEventListener("click", prevQuestion);
     $("#share-btn").addEventListener("click", shareResult);
+    $("#save-img-btn").addEventListener("click", saveResultImage);
     $("#restart-btn").addEventListener("click", restart);
     $("#result-home-btn").addEventListener("click", toHome);
     document.addEventListener("keydown", onKeyDown);
