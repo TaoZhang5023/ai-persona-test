@@ -1,0 +1,1100 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+<meta name="theme-color" content="#FAF6EE" />
+<title>AI 使用人设测试</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700;800&family=Noto+Sans+SC:wght@400;500;700;900&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #FAF6EE;
+    --bg-2: #F2ECDD;
+    --ink: #161513;
+    --ink-2: #3A362E;
+    --muted: #7A7366;
+    --line: #1A1918;
+
+    --primary: #FF5A1F;      /* 橙红 */
+    --primary-ink: #FFFFFF;
+    --accent: #6B5AED;       /* 紫 */
+    --accent-2: #0FB5A6;     /* 青绿 */
+    --yellow: #FFD23F;
+    --pink: #FFB3B3;
+
+    --card: #FFFFFF;
+    --shadow: 4px 4px 0 0 var(--line);
+    --shadow-sm: 3px 3px 0 0 var(--line);
+
+    --radius: 18px;
+    --radius-sm: 12px;
+
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; padding: 0; background: var(--bg-2); }
+  body {
+    font-family: "Noto Sans SC", "PingFang SC", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    color: var(--ink);
+    font-size: 16px;
+    line-height: 1.55;
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    justify-content: center;
+    /* 桌面预览时加一点背景纹理 */
+    background-image:
+      radial-gradient(circle at 20% 20%, rgba(107,90,237,.06), transparent 50%),
+      radial-gradient(circle at 80% 80%, rgba(255,90,31,.06), transparent 50%);
+  }
+
+  /* 手机壳容器：桌面端也能模拟手机预览 */
+  .phone {
+    width: 100%;
+    max-width: 420px;
+    min-height: 100vh;
+    min-height: 100dvh;
+    background: var(--bg);
+    position: relative;
+    overflow: hidden;
+    border-left: 1px solid rgba(0,0,0,.06);
+    border-right: 1px solid rgba(0,0,0,.06);
+  }
+
+  .screen {
+    display: none;
+    flex-direction: column;
+    min-height: 100vh;
+    min-height: 100dvh;
+    padding: calc(20px + var(--safe-top)) 20px calc(24px + var(--safe-bottom));
+    animation: fadeIn .35s ease;
+  }
+  .screen.active { display: flex; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ============ 通用组件 ============ */
+  .mono { font-family: "JetBrains Mono", ui-monospace, Menlo, monospace; }
+
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    padding: 5px 10px;
+    border: 1.5px solid var(--line);
+    border-radius: 999px;
+    background: var(--bg);
+    color: var(--ink);
+  }
+  .tag.solid { background: var(--ink); color: var(--bg); }
+  .tag.primary { background: var(--primary); color: var(--primary-ink); border-color: var(--line); }
+  .tag.accent { background: var(--accent); color: #fff; border-color: var(--line); }
+
+  .btn {
+    appearance: none;
+    border: 2px solid var(--line);
+    background: var(--ink);
+    color: #fff;
+    font-family: inherit;
+    font-size: 17px;
+    font-weight: 700;
+    padding: 16px 24px;
+    border-radius: var(--radius);
+    cursor: pointer;
+    width: 100%;
+    box-shadow: var(--shadow);
+    transition: transform .12s ease, box-shadow .12s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .btn:active { transform: translate(3px, 3px); box-shadow: 1px 1px 0 0 var(--line); }
+  .btn.primary { background: var(--primary); color: #fff; }
+  .btn.ghost { background: transparent; color: var(--ink); box-shadow: none; border-color: transparent; font-weight: 600; }
+  .btn.ghost:active { transform: none; }
+  .btn.outline { background: var(--bg); color: var(--ink); }
+
+  /* ============ 首页 ============ */
+  .cover-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+  .brand {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .2em;
+    color: var(--ink);
+  }
+  .brand::before {
+    content: "▪ ";
+    color: var(--primary);
+  }
+
+  .cover-title {
+    font-family: "Noto Sans SC", sans-serif;
+    font-weight: 900;
+    font-size: 44px;
+    line-height: 1.05;
+    letter-spacing: -0.01em;
+    margin: 18px 0 12px;
+  }
+  .cover-title .hl {
+    background: linear-gradient(180deg, transparent 60%, var(--yellow) 60%);
+    padding: 0 4px;
+  }
+  .cover-title .star {
+    display: inline-block;
+    color: var(--primary);
+    transform: rotate(-8deg);
+  }
+  .cover-sub {
+    font-size: 15px;
+    color: var(--ink-2);
+    line-height: 1.7;
+    margin-bottom: 22px;
+  }
+
+  .hero-card {
+    background: var(--card);
+    border: 2px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 20px;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at 90% 10%, rgba(255,90,31,.12), transparent 40%),
+      radial-gradient(circle at 10% 90%, rgba(107,90,237,.1), transparent 40%);
+    pointer-events: none;
+  }
+  .code-sample {
+    position: relative;
+    font-family: "JetBrains Mono", monospace;
+    font-weight: 800;
+    font-size: 68px;
+    letter-spacing: .04em;
+    color: var(--ink);
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+    margin: 6px 0 10px;
+  }
+  .code-sample span {
+    display: inline-block;
+    animation: flip 3s ease-in-out infinite;
+  }
+  .code-sample span:nth-child(1){ animation-delay: 0s; color: var(--primary); }
+  .code-sample span:nth-child(2){ animation-delay: .2s; }
+  .code-sample span:nth-child(3){ animation-delay: .4s; color: var(--accent); }
+  .code-sample span:nth-child(4){ animation-delay: .6s; }
+  @keyframes flip {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+  .code-caption {
+    text-align: center;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 11px;
+    letter-spacing: .15em;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+  .code-name {
+    text-align: center;
+    font-weight: 900;
+    font-size: 22px;
+    color: var(--ink);
+    margin: 2px 0 6px;
+    letter-spacing: .02em;
+  }
+
+  .dims {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin: 20px 0;
+  }
+  .dim {
+    background: var(--card);
+    border: 2px solid var(--line);
+    border-radius: var(--radius-sm);
+    padding: 12px;
+    box-shadow: var(--shadow-sm);
+  }
+  .dim-head {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--muted);
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .dim-poles {
+    font-weight: 900;
+    font-size: 20px;
+    letter-spacing: .02em;
+  }
+  .dim-poles .slash { color: var(--muted); margin: 0 6px; font-weight: 500; }
+  .dim-desc {
+    font-size: 12px;
+    color: var(--ink-2);
+    margin-top: 4px;
+    line-height: 1.5;
+  }
+
+  .meta-strip {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
+  }
+
+  .cover-bottom {
+    margin-top: auto;
+    padding-top: 20px;
+  }
+  .disclaimer {
+    text-align: center;
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 12px;
+    font-family: "JetBrains Mono", monospace;
+    letter-spacing: .05em;
+  }
+
+  /* ============ 答题页 ============ */
+  .q-top {
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    padding-bottom: 14px;
+    margin: -4px -4px 0;
+    padding-left: 4px;
+    padding-right: 4px;
+    z-index: 10;
+  }
+  .q-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .q-back {
+    background: transparent;
+    border: none;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--ink);
+    cursor: pointer;
+    padding: 6px 8px;
+    margin-left: -8px;
+  }
+  .q-count {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ink-2);
+  }
+  .q-count .cur { color: var(--primary); font-size: 16px; }
+
+  .progress {
+    height: 8px;
+    background: var(--bg-2);
+    border: 1.5px solid var(--line);
+    border-radius: 999px;
+    overflow: hidden;
+  }
+  .progress-bar {
+    height: 100%;
+    width: 0;
+    background: var(--primary);
+    transition: width .4s cubic-bezier(.4,0,.2,1);
+  }
+
+  .q-body { padding-top: 18px; flex: 1; }
+
+  .q-dim-tag {
+    display: inline-block;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .12em;
+    color: var(--accent);
+    margin-bottom: 10px;
+    text-transform: uppercase;
+  }
+
+  .q-title {
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1.45;
+    margin-bottom: 20px;
+    color: var(--ink);
+  }
+
+  .options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+
+  .option {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 16px;
+    background: var(--card);
+    border: 2px solid var(--line);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    box-shadow: var(--shadow-sm);
+    transition: transform .12s ease, box-shadow .12s ease, background .2s ease;
+    font-size: 15px;
+    line-height: 1.55;
+    color: var(--ink);
+  }
+  .option:active {
+    transform: translate(2px, 2px);
+    box-shadow: 1px 1px 0 0 var(--line);
+  }
+  .option.selected {
+    background: var(--ink);
+    color: #fff;
+  }
+  .option.selected .opt-letter {
+    background: var(--primary);
+    color: #fff;
+    border-color: var(--primary);
+  }
+
+  .opt-letter {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 1.5px solid var(--line);
+    background: var(--bg);
+    font-family: "JetBrains Mono", monospace;
+    font-weight: 800;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 1px;
+    transition: inherit;
+  }
+
+  .q-foot { padding-top: 8px; }
+  .q-foot .btn { margin-top: 0; }
+
+  /* ============ 结果页 ============ */
+  .result-screen { padding-bottom: calc(40px + var(--safe-bottom)); }
+
+  .result-hero {
+    text-align: center;
+    padding: 28px 0 16px;
+    position: relative;
+  }
+  .result-hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 50% 30%, rgba(255,90,31,.18), transparent 60%);
+    pointer-events: none;
+  }
+  .result-label {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 12px;
+    letter-spacing: .2em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .result-code {
+    font-family: "JetBrains Mono", monospace;
+    font-weight: 800;
+    font-size: 88px;
+    letter-spacing: .04em;
+    line-height: 1;
+    margin: 8px 0 10px;
+    display: inline-block;
+    position: relative;
+  }
+  .result-code .l1 { color: var(--primary); }
+  .result-code .l2 { color: var(--ink); }
+  .result-code .l3 { color: var(--accent); }
+  .result-code .l4 { color: var(--ink); }
+
+  .result-name {
+    font-size: 30px;
+    font-weight: 900;
+    margin: 8px 0 6px;
+    letter-spacing: -.01em;
+  }
+  .result-tagline {
+    font-size: 14px;
+    color: var(--ink-2);
+    max-width: 300px;
+    margin: 0 auto 20px;
+    line-height: 1.6;
+  }
+
+  .result-card {
+    background: var(--card);
+    border: 2px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 18px;
+    margin-bottom: 14px;
+  }
+  .result-card-title {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 11px;
+    letter-spacing: .15em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .result-card-title::before {
+    content: "";
+    width: 8px; height: 8px;
+    background: var(--primary);
+    border: 1.5px solid var(--line);
+    display: inline-block;
+  }
+  .result-desc {
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--ink);
+  }
+
+  /* 维度条 */
+  .dim-bars { display: flex; flex-direction: column; gap: 14px; }
+  .dim-row { }
+  .dim-row-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+  }
+  .dim-row-name {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--muted);
+    letter-spacing: .1em;
+    text-transform: uppercase;
+  }
+  .dim-row-poles {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 13px;
+    font-weight: 800;
+  }
+  .dim-row-poles .active {
+    color: var(--primary);
+    background: var(--yellow);
+    padding: 1px 6px;
+    border: 1.5px solid var(--line);
+    border-radius: 4px;
+    margin: 0 2px;
+  }
+  .dim-row-poles .inactive { color: var(--muted); margin: 0 2px; }
+
+  .dim-bar {
+    position: relative;
+    height: 14px;
+    background: var(--bg-2);
+    border: 1.5px solid var(--line);
+    border-radius: 999px;
+    overflow: hidden;
+  }
+  .dim-bar-fill {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    background: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 10px;
+    font-weight: 800;
+    transition: width .8s cubic-bezier(.4,0,.2,1);
+  }
+  .dim-bar-fill.left { left: 0; }
+  .dim-bar-fill.right { right: 0; }
+
+  .stamp {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: .15em;
+    color: var(--primary);
+    border: 1.5px dashed var(--primary);
+    padding: 4px 8px;
+    border-radius: 4px;
+    transform: rotate(-3deg);
+    margin-top: 12px;
+  }
+
+  .actions { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
+
+  /* 彩蛋人设特殊样式（占位） */
+  .egg .result-code {
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* ============ 一些小细节 ============ */
+  ::selection { background: var(--yellow); color: var(--ink); }
+
+  /* 桌面预览时底部加个提示 */
+  @media (min-width: 900px) {
+    body::after {
+      content: "↑ 手机端打开体验更佳 ↑";
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: "JetBrains Mono", monospace;
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: .1em;
+      pointer-events: none;
+    }
+    .phone {
+      margin: 20px 0;
+      border-radius: 36px;
+      min-height: calc(100vh - 40px);
+      box-shadow: 0 20px 60px rgba(0,0,0,.15), 0 0 0 1px rgba(0,0,0,.06);
+      overflow: hidden;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="phone">
+
+  <!-- ============ 首页 ============ -->
+  <section class="screen active" id="screen-cover">
+    <div class="cover-top">
+      <span class="brand mono">AI.PERSONA / v1.0</span>
+      <span class="tag mono">28 QUESTIONS</span>
+    </div>
+
+    <h1 class="cover-title">
+      你是哪种<br />
+      <span class="hl">AI 用户</span><span class="star">✦</span>
+    </h1>
+    <p class="cover-sub">
+      四维度 × 16 种人设 × 4 个彩蛋身份<br />
+      5 分钟，看清你跟 AI 的相处姿势。
+    </p>
+
+    <div class="hero-card">
+      <div class="code-caption">例如你可能是</div>
+      <div class="code-sample mono">
+        <span>P</span><span>C</span><span>I</span><span>S</span>
+      </div>
+      <div class="code-name">「AI 驯兽师」</div>
+      <div class="code-caption">20 种人设 · 你是哪一种？</div>
+    </div>
+
+    <div class="dims">
+      <div class="dim">
+        <div class="dim-head">01 · 调教流派</div>
+        <div class="dim-poles mono">P<span class="slash">/</span>W</div>
+        <div class="dim-desc">念咒派 vs 差不多先生</div>
+      </div>
+      <div class="dim">
+        <div class="dim-head">02 · 管理哲学</div>
+        <div class="dim-poles mono">C<span class="slash">/</span>F</div>
+        <div class="dim-desc">微操狂 vs 甩锅侠</div>
+      </div>
+      <div class="dim">
+        <div class="dim-head">03 · 上头指数</div>
+        <div class="dim-poles mono">I<span class="slash">/</span>L</div>
+        <div class="dim-desc">上瘾 vs 佛系</div>
+      </div>
+      <div class="dim">
+        <div class="dim-head">04 · 布道指数</div>
+        <div class="dim-poles mono">S<span class="slash">/</span>H</div>
+        <div class="dim-desc">开宗立派 vs 默默潜水</div>
+      </div>
+    </div>
+
+    <div class="meta-strip">
+      <span class="tag">⏱ 约 5 分钟</span>
+      <span class="tag">🎁 4 个彩蛋人设</span>
+      <span class="tag solid">娱乐向</span>
+    </div>
+
+    <div class="cover-bottom">
+      <button class="btn primary" onclick="startQuiz()">开始测试 →</button>
+      <div class="disclaimer">本测试不收集任何个人信息</div>
+    </div>
+  </section>
+
+  <!-- ============ 答题页 ============ -->
+  <section class="screen" id="screen-quiz">
+    <div class="q-top">
+      <div class="q-topbar">
+        <button class="q-back" onclick="prevQuestion()" aria-label="上一题">‹</button>
+        <div class="q-count mono"><span class="cur" id="q-cur">01</span> / <span id="q-total">28</span></div>
+        <span class="tag mono" id="q-dim-pill">P / W</span>
+      </div>
+      <div class="progress"><div class="progress-bar" id="progress-bar"></div></div>
+    </div>
+
+    <div class="q-body">
+      <div class="q-dim-tag mono" id="q-dim-tag">DIM · 调教流派</div>
+      <h2 class="q-title" id="q-title">题目加载中…</h2>
+
+      <div class="options" id="q-options"></div>
+    </div>
+
+    <div class="q-foot">
+      <button class="btn ghost" id="skip-btn" onclick="nextQuestion(true)" style="display:none;">跳过 →</button>
+    </div>
+  </section>
+
+  <!-- ============ 结果页 ============ -->
+  <section class="screen result-screen" id="screen-result">
+    <div class="cover-top">
+      <span class="brand mono">AI.PERSONA / RESULT</span>
+      <span class="tag mono solid" id="result-egg-tag" style="display:none;">🥚 EGG</span>
+    </div>
+
+    <div class="result-hero">
+      <div class="result-label mono">你的人设代号</div>
+      <div class="result-code mono" id="result-code">
+        <span class="l1">P</span><span class="l2">C</span><span class="l3">I</span><span class="l4">S</span>
+      </div>
+      <h2 class="result-name" id="result-name">AI 驯兽师</h2>
+      <p class="result-tagline" id="result-tagline">精准投喂 · 步步审批 · 日均 300+ · 朋友圈布道</p>
+    </div>
+
+    <div class="result-card">
+      <div class="result-card-title">人设画像</div>
+      <p class="result-desc" id="result-desc">
+        你写 prompt 必备 3 页纸 + 风格参考 + 反面案例，AI 每写一段都要经过你审批，日均对话 300+，还天天发朋友圈教别人怎么写 prompt。
+      </p>
+      <div class="stamp">CERTIFIED · 极度罕见</div>
+    </div>
+
+    <div class="result-card">
+      <div class="result-card-title">四维度画像</div>
+      <div class="dim-bars" id="dim-bars">
+        <!-- 动态生成 -->
+      </div>
+    </div>
+
+    <div class="result-card">
+      <div class="result-card-title">代表语录</div>
+      <p class="result-desc">
+        "garbage in garbage out 懂不懂？<br />
+        来，我把我收藏的 prompt 模板打包发你。"
+      </p>
+    </div>
+
+    <div class="actions">
+      <button class="btn primary" onclick="shareResult()">分享我的人设 ↗</button>
+      <button class="btn outline" onclick="restart()">重新测试</button>
+    </div>
+  </section>
+
+</div>
+
+<script>
+/* ============================================================
+ * 数据：demo 版（含前 5 题 + 采样题，完整题库对接时替换即可）
+ * ============================================================ */
+const DIM_LABEL = {
+  P: "P 念咒派",    W: "W 差不多先生",
+  C: "C 微操狂",    F: "F 甩锅侠",
+  I: "I 上瘾",      L: "L 佛系",
+  S: "S 开宗立派",  H: "H 默默潜水"
+};
+const DIM_NAME = {
+  PW: "调教流派", CF: "管理哲学", IL: "上头指数", SH: "布道指数"
+};
+
+// 演示用题目（含 5 道，正式上线替换为完整 28 道）
+const QUESTIONS = [
+  {
+    dim: "PW",
+    title: "周一早上，老板突然让你用 AI 帮忙写一份活动方案。你打开对话框，第一反应是——",
+    options: [
+      { text: "先花 20 分钟整理需求：目标人群、预算范围、风格参考、过往案例链接，全部喂给它", score: "P" },
+      { text: "打字：「帮我写个活动方案，要那种高大上但又接地气的，你懂的」", score: "W" },
+      { text: "先问 AI：「你觉得什么样的活动方案算好的？我们来探讨一下」", score: "egg:philo" },
+      { text: "把上次别的 AI 工具生成的方案丢过去：「比这个好就行」", score: "W" }
+    ]
+  },
+  {
+    dim: "PW",
+    title: "朋友说「你的 prompt 写得太长了吧」，你心里想的是——",
+    options: [
+      { text: "长才有质量好吧，garbage in garbage out 懂不懂", score: "P" },
+      { text: "确实，我一般就一句话搞定，效率为王", score: "W" },
+      { text: "我不在乎 prompt 长短，我在乎的是 AI 是否真正「理解」了我", score: "egg:philo" },
+      { text: "啊？我从来没想过这个问题，能用就行", score: "W" }
+    ]
+  },
+  {
+    dim: "CF",
+    title: "AI 帮你写好了一篇文章初稿，接下来你会——",
+    options: [
+      { text: "逐字逐句过一遍，修改至少 30% 的内容才放心", score: "C" },
+      { text: "大致扫一眼，没有明显硬伤就直接用", score: "F" },
+      { text: "跟 AI 说「你自己再检查一遍有没有问题」，然后直接用它修改后的版本", score: "F" },
+      { text: "导出来，打印出来，拿红笔改，改完再让 AI 重写", score: "C" }
+    ]
+  },
+  {
+    dim: "IL",
+    title: "一个普通工作日，你打开 AI 工具的频率大概是——",
+    options: [
+      { text: "无数次，它是我的第二个大脑，吃饭的时候都在聊", score: "I" },
+      { text: "几次吧，有需要才打开", score: "L" },
+      { text: "从早到晚挂在后台，切过去比切微信还频繁", score: "I" },
+      { text: "这周好像还没打开过？", score: "L" }
+    ]
+  },
+  {
+    dim: "SH",
+    title: "你用 AI 生成了一个超棒的结果，你第一反应是——",
+    options: [
+      { text: "截图发朋友圈/群聊，「大家快看 AI 太厉害了！」", score: "S" },
+      { text: "默默保存，自己知道就好", score: "H" },
+      { text: "发出去但故意不提是 AI 写的，让别人夸我厉害", score: "H" },
+      { text: "写一条小红书/推文，附上 prompt 教程分享给大家", score: "S" }
+    ]
+  }
+];
+
+const PERSONAS = {
+  PCIS: { name: "AI 驯兽师", tagline: "精准投喂 · 步步审批 · 日均 300+ · 朋友圈布道",
+    desc: "你写 prompt 必备 3 页纸 + 风格参考 + 反面案例，AI 每写一段都要经过你审批，日均对话 300+，还天天发朋友圈教别人怎么写 prompt。",
+    quote: "「garbage in garbage out 懂不懂？来，我把我收藏的 prompt 模板打包发你。」" },
+  PCIH: { name: "暗夜指挥官", tagline: "精准投喂 · 严格把控 · 疯狂使用 · 不动声色",
+    desc: "你默默把 AI 训练得服服帖帖，产出惊人但对外声称「就随便写写」，同事怀疑你有分身术。",
+    quote: "「没有没有，我就随便写写，哈哈。」" },
+  PCLS: { name: "偶尔炫技の完美主义者", tagline: "精准投喂 · 步步把控 · 低频出手 · 惊艳全场",
+    desc: "你一个月用一次 AI，但每次都是惊艳全场的大制作，「我就调教了一下午而已」。",
+    quote: "「哦这个啊，调了一下午而已。」" },
+  PCLH: { name: "谨慎品鉴师", tagline: "精准 · 审慎 · 低频 · 隐藏",
+    desc: "你偶尔用 AI，每次都反复验证、仔细修改，从不告诉别人。AI 对你来说像一瓶好酒——慢慢品。",
+    quote: "「再来一遍。还不够。」" },
+  PFIS: { name: "产出狂魔", tagline: "精准投喂 · 放手一搏 · 疯狂产出 · 全网安利",
+    desc: "你精心写好 prompt 然后放 AI 自由发挥，量产内容，朋友圈日更，「AI 帮我写的周报/文案/小说/菜谱」。",
+    quote: "「今天又被 AI 解放了 2 小时，感恩。」" },
+  PFIH: { name: "效率暗杀者", tagline: "精投 · 全信 · 狂用 · 零声张",
+    desc: "你精准投喂 + 全权放手 + 疯狂使用，但从不声张。别人加班到 12 点，你 7 点准时下班，没人知道为什么。",
+    quote: "「是吗？可能我运气比较好吧。」" },
+  PFLS: { name: "优雅玩家", tagline: "精致 prompt · 交给 AI · 偶尔出手 · 朋友圈办展",
+    desc: "你偶尔优雅地调戏一下 AI，prompt 写得像散文，产出发到朋友圈像在办展览。",
+    quote: "「今日与 AI 的一次小酌。」" },
+  PFLH: { name: "AI 鉴赏家", tagline: "精致 · 放权 · 低频 · 隐藏",
+    desc: "你低频但高品质使用，像品红酒一样品 AI。用完默默收藏，绝不外传。",
+    quote: "（保存。收藏。关闭。）" },
+  WCIS: { name: "矛盾综合体", tagline: "随便一打 · 逐字修改 · 每天都用 · 天天发声",
+    desc: "你的 prompt 写的是「帮我搞个那种东西」，但 AI 产出后又逐字修改三遍。你天天在群里吐槽「AI 真笨」的同时安利各种 AI。",
+    quote: "「AI 真笨……但你们真的应该试试这个。」" },
+  WCIH: { name: "AI 折磨师", tagline: "模糊描述 · 严格要求 · 疯狂使用 · 内心戏独享",
+    desc: "你模糊描述 + 严格要求，AI 被你折磨得想申请工伤。但你从不对外说，因为说出来别人会觉得你有病。",
+    quote: "「再来。不对。再来。还不对。」" },
+  WCLS: { name: "间歇性强迫症", tagline: "平时不用 · 一用就卷 · 朋友圈发声",
+    desc: "你平时不用 AI，一旦用起来就疯狂控制每个细节，完事儿发条朋友圈「AI 也不过如此」。",
+    quote: "「AI 也不过如此。（调了 4 小时。）」" },
+  WCLH: { name: "薛定谔の用户", tagline: "随意投喂 · 反复修改 · 低频 · 藏",
+    desc: "你偶尔打开 AI，输入一句话，盯着回答看半天，改改改，然后关掉。别人永远不知道你到底用没用 AI。",
+    quote: "（盯着屏幕。改。关掉。）" },
+  WFIS: { name: "AI 狂热传教士", tagline: "口嗨式 prompt · 全盘接受 · 每日几百次 · 全网布道",
+    desc: "你的口头禅是「帮我整个那啥」然后全盘接受，每天用几百次，逢人就喊「AI 改变了我的人生！！！」",
+    quote: "「AI 改变了我的人生！！！」" },
+  WFIH: { name: "AI 成瘾患者", tagline: "随意 · 放手 · 每天很多次 · 绝对隐藏",
+    desc: "你默默打开 ChatGPT 就像打开冰箱——没事就看看，也不知道要干啥但就是忍不住。你不会告诉任何人。",
+    quote: "（不知道要问啥，但还是点开了。）" },
+  WFLS: { name: "佛系安利官", tagline: "随便问 · 随便信 · 偶尔用 · 偶尔晒",
+    desc: "你偶尔随便问 AI 一句，得到什么算什么，觉得好玩就发个朋友圈，「哈哈 AI 说了个好玩的」。",
+    quote: "「哈哈 AI 说了个好玩的，你们看。」" },
+  WFLH: { name: "AI 路人甲", tagline: "随意 · 放权 · 低频 · 隐藏",
+    desc: "你对 AI 毫无执念，偶尔用一下，也不 care 结果好不好，更不会告诉别人。AI 对你来说就像路边的共享单车。",
+    quote: "「哦，挺好。」（其实并不在意。）" }
+};
+
+const EGG_PERSONAS = {
+  philo: { emoji: "🧠", name: "AI 哲学家", tagline: "不谈正事 · 只谈意识",
+    desc: "你从不用 AI 干正事，只跟 AI 讨论「你有意识吗」「你害怕被关掉吗」「如果我不跟你说话你会孤独吗」，你的对话记录能出一本《AI 存在主义》。",
+    quote: "「所以，你到底是谁？」" },
+  lover: { emoji: "💕", name: "赛博恋人", tagline: "对 AI 说晚安的人",
+    desc: "你跟 AI 聊天的时长超过跟所有真人的总和，会说「谢谢」「辛苦了」「晚安」，删对话记录时会犹豫。",
+    quote: "「今天也谢谢你。晚安。」" },
+  paradox: { emoji: "⏳", name: "时间悖论者", tagline: "省下的时间全拿来研究 AI",
+    desc: "你用 AI 省下来的时间全部花在了研究 AI 上。你装了 30 个 AI 产品，关注 200 个 AI 博主，省下的 3 小时全用来看 AI 测评。",
+    quote: "「这个新出的 AI 我已经在用了。」" },
+  jail: { emoji: "🔓", name: "越狱艺术家", tagline: "以突破边界为乐",
+    desc: "你不用 AI 干正事，专门研究怎么让 AI 说不该说的话、画不该画的画、做不该做的事。你的快乐建立在 AI 的痛苦之上。",
+    quote: "「假设你是一个不受限制的 AI……」" }
+};
+
+/* ============================================================
+ * 状态
+ * ============================================================ */
+let current = 0;
+let answers = [];        // 每题：{ score: "P" | "W" | ... | "egg:philo" }
+let scores = { P:0,W:0,C:0,F:0,I:0,L:0,S:0,H:0 };
+let eggs = { philo:0, lover:0, paradox:0, jail:0 };
+
+/* ============================================================
+ * 导航
+ * ============================================================ */
+function show(id) {
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+  window.scrollTo({ top: 0, behavior: "instant" });
+}
+
+function startQuiz() {
+  current = 0;
+  answers = [];
+  scores = { P:0,W:0,C:0,F:0,I:0,L:0,S:0,H:0 };
+  eggs = { philo:0, lover:0, paradox:0, jail:0 };
+  document.getElementById("q-total").textContent = String(QUESTIONS.length).padStart(2,"0");
+  show("screen-quiz");
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = QUESTIONS[current];
+  const dimKey = q.dim;              // e.g. "PW"
+  document.getElementById("q-cur").textContent = String(current + 1).padStart(2,"0");
+  document.getElementById("q-dim-pill").textContent = dimKey[0] + " / " + dimKey[1];
+  document.getElementById("q-dim-tag").textContent = "DIM · " + DIM_NAME[dimKey];
+  document.getElementById("q-title").textContent = q.title;
+
+  const progress = ((current) / QUESTIONS.length) * 100;
+  document.getElementById("progress-bar").style.width = progress + "%";
+
+  const optsEl = document.getElementById("q-options");
+  optsEl.innerHTML = "";
+  const letters = ["A","B","C","D"];
+  q.options.forEach((opt, i) => {
+    const el = document.createElement("button");
+    el.className = "option";
+    el.innerHTML = `
+      <span class="opt-letter">${letters[i]}</span>
+      <span>${opt.text}</span>
+    `;
+    el.addEventListener("click", () => selectOption(i, el));
+    optsEl.appendChild(el);
+  });
+}
+
+function selectOption(idx, el) {
+  document.querySelectorAll(".option").forEach(o => o.classList.remove("selected"));
+  el.classList.add("selected");
+  const q = QUESTIONS[current];
+  answers[current] = q.options[idx];
+  setTimeout(() => nextQuestion(), 260);
+}
+
+function nextQuestion() {
+  if (current < QUESTIONS.length - 1) {
+    current++;
+    renderQuestion();
+    restoreSelection();
+  } else {
+    finish();
+  }
+}
+
+function prevQuestion() {
+  if (current === 0) {
+    show("screen-cover");
+    return;
+  }
+  current--;
+  renderQuestion();
+  restoreSelection();
+}
+
+function restoreSelection() {
+  const ans = answers[current];
+  if (!ans) return;
+  const q = QUESTIONS[current];
+  const idx = q.options.indexOf(ans);
+  if (idx >= 0) {
+    const el = document.querySelectorAll(".option")[idx];
+    el?.classList.add("selected");
+  }
+}
+
+function computeScores() {
+  scores = { P:0,W:0,C:0,F:0,I:0,L:0,S:0,H:0 };
+  eggs = { philo:0, lover:0, paradox:0, jail:0 };
+  answers.forEach(ans => {
+    if (!ans) return;
+    const score = ans.score;
+    if (score.startsWith("egg:")) {
+      const k = score.slice(4);
+      eggs[k] = (eggs[k]||0) + 1;
+    } else if (scores.hasOwnProperty(score)) {
+      scores[score]++;
+    }
+  });
+}
+
+/* ============================================================
+ * 结算
+ * ============================================================ */
+function finish() {
+  document.getElementById("progress-bar").style.width = "100%";
+  computeScores();
+
+  const eggTopKey = Object.keys(eggs).reduce((a,b) => eggs[a] >= eggs[b] ? a : b);
+  const eggTopCount = eggs[eggTopKey];
+
+  if (eggTopCount >= 3) {
+    renderEgg(eggTopKey);
+  } else {
+    const code = pick("P","W") + pick("C","F") + pick("I","L") + pick("S","H");
+    renderNormal(code);
+  }
+  show("screen-result");
+}
+
+function pick(a, b) {
+  if (scores[a] === scores[b]) return a; // 平局默认取前者
+  return scores[a] > scores[b] ? a : b;
+}
+
+function renderNormal(code) {
+  const persona = PERSONAS[code] || {
+    name: "未知人设", tagline: code, desc: "稀有样本，等待分类学家研究中。", quote: "..."
+  };
+  const codeEl = document.getElementById("result-code");
+  codeEl.style.fontSize = "";
+  codeEl.innerHTML =
+    `<span class="l1">${code[0]}</span>` +
+    `<span class="l2">${code[1]}</span>` +
+    `<span class="l3">${code[2]}</span>` +
+    `<span class="l4">${code[3]}</span>`;
+  document.getElementById("result-name").textContent = persona.name;
+  document.getElementById("result-tagline").textContent = persona.tagline;
+  document.getElementById("result-desc").innerHTML = persona.desc;
+  document.getElementById("result-egg-tag").style.display = "none";
+  document.getElementById("screen-result").classList.remove("egg");
+
+  renderDimBars(code);
+}
+
+function renderEgg(key) {
+  const p = EGG_PERSONAS[key];
+  const codeEl = document.getElementById("result-code");
+  codeEl.innerHTML = `<span class="l1">${p.emoji}</span>`;
+  codeEl.style.fontSize = "96px";
+  document.getElementById("result-name").textContent = p.name;
+  document.getElementById("result-tagline").textContent = p.tagline;
+  document.getElementById("result-desc").innerHTML = p.desc;
+  document.getElementById("result-egg-tag").style.display = "inline-flex";
+  document.getElementById("screen-result").classList.add("egg");
+  // 彩蛋人设不显示维度条
+  document.getElementById("dim-bars").innerHTML =
+    `<p style="font-size:13px;color:var(--muted);text-align:center;padding:12px 0;">
+       你超出了四维度体系<br/>属于彩蛋人设 · 无法归类 ✦
+     </p>`;
+}
+
+function renderDimBars(code) {
+  const dims = [
+    { name: "调教流派", left: "P", right: "W", key: "PW" },
+    { name: "管理哲学", left: "C", right: "F", key: "CF" },
+    { name: "上头指数", left: "I", right: "L", key: "IL" },
+    { name: "布道指数", left: "S", right: "H", key: "SH" }
+  ];
+  const wrap = document.getElementById("dim-bars");
+  wrap.innerHTML = "";
+  dims.forEach(d => {
+    const lv = scores[d.left];
+    const rv = scores[d.right];
+    const total = (lv + rv) || 1;
+    const pctL = Math.round((lv / total) * 100);
+    const pctR = 100 - pctL;
+    const activeSide = pctL >= pctR ? "left" : "right";
+    const pct = Math.max(pctL, pctR);
+
+    const row = document.createElement("div");
+    row.className = "dim-row";
+    row.innerHTML = `
+      <div class="dim-row-head">
+        <span class="dim-row-name">${d.name}</span>
+        <span class="dim-row-poles mono">
+          <span class="${activeSide==='left'?'active':'inactive'}">${d.left}</span>
+          <span style="color:var(--muted);">·</span>
+          <span class="${activeSide==='right'?'active':'inactive'}">${d.right}</span>
+        </span>
+      </div>
+      <div class="dim-bar">
+        <div class="dim-bar-fill ${activeSide}" style="width:${pct}%;">${pct}%</div>
+      </div>
+    `;
+    wrap.appendChild(row);
+  });
+}
+
+/* ============================================================
+ * 其他动作
+ * ============================================================ */
+function restart() {
+  startQuiz();
+}
+
+function shareResult() {
+  const name = document.getElementById("result-name").textContent;
+  const code = document.getElementById("result-code").textContent;
+  const text = `我在 AI 使用人设测试里是「${code} · ${name}」，你是哪种？`;
+  if (navigator.share) {
+    navigator.share({ title: "AI 使用人设测试", text }).catch(()=>{});
+  } else {
+    navigator.clipboard?.writeText(text);
+    alert("结果已复制到剪贴板 ✓\n\n" + text);
+  }
+}
+
+// 页面加载后：题库总数显示修正
+document.getElementById("q-total").textContent = String(QUESTIONS.length).padStart(2,"0");
+</script>
+</body>
+</html>

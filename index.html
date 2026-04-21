@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#FAF6EE" />
+  <meta name="description" content="四维度 × 16 种 AI 使用人设 + 4 个彩蛋身份。5 分钟，看清你跟 AI 的相处姿势。" />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="AI 使用人设测试 · 你是哪种 AI 用户？" />
+  <meta property="og:description" content="四维度 × 16 种人设 + 4 个彩蛋身份。5 分钟，看清你跟 AI 的相处姿势。" />
+  <meta property="og:locale" content="zh_CN" />
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="AI 使用人设测试" />
+  <meta name="twitter:description" content="你是 AI 驯兽师、赛博恋人，还是 AI 路人甲？5 分钟测一下。" />
+
+  <title>AI 使用人设测试 · 你是哪种 AI 用户？</title>
+
+  <!-- Favicon (inline SVG) -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%23FAF6EE'/><text x='50%25' y='54%25' text-anchor='middle' dominant-baseline='middle' font-family='JetBrains Mono, monospace' font-weight='800' font-size='26' fill='%23FF5A1F'>AI</text><text x='50%25' y='82%25' text-anchor='middle' font-family='JetBrains Mono, monospace' font-weight='800' font-size='9' fill='%231A1918' letter-spacing='1'>PERSONA</text></svg>" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700;800&family=Noto+Sans+SC:wght@400;500;700;900&display=swap"
+    rel="stylesheet"
+  />
+
+  <link rel="stylesheet" href="assets/styles.css" />
+</head>
+<body>
+
+<main class="phone">
+
+  <!-- ============ 首页 ============ -->
+  <section class="screen active" id="screen-cover">
+    <header class="cover-top">
+      <span class="brand mono">AI.PERSONA / v1.0</span>
+      <span class="tag mono"><span id="cover-q-total">12</span> QUESTIONS</span>
+    </header>
+
+    <h1 class="cover-title">
+      你是哪种<br />
+      <span class="hl">AI 用户</span><span class="star">✦</span>
+    </h1>
+    <p class="cover-sub">
+      四维度 × 16 种人设 + 4 个彩蛋身份<br />
+      3 分钟，看清你跟 AI 的相处姿势。
+    </p>
+
+    <div class="hero-card">
+      <div class="code-caption">例如你可能是</div>
+      <div class="code-sample mono">
+        <span>P</span><span>C</span><span>I</span><span>S</span>
+      </div>
+      <div class="code-name">「AI 驯兽师」</div>
+      <div class="code-caption">16 + 4 种人设 · 你是哪一种？</div>
+    </div>
+
+    <section class="dims" aria-label="四维度说明">
+      <div class="dim">
+        <div class="dim-head">01 · 调教流派</div>
+        <div class="dim-poles">P<span class="slash">/</span>W</div>
+        <div class="dim-desc">念咒派 vs 差不多先生</div>
+      </div>
+      <div class="dim">
+        <div class="dim-head">02 · 管理哲学</div>
+        <div class="dim-poles">C<span class="slash">/</span>F</div>
+        <div class="dim-desc">微操狂 vs 甩锅侠</div>
+      </div>
+      <div class="dim">
+        <div class="dim-head">03 · 上头指数</div>
+        <div class="dim-poles">I<span class="slash">/</span>L</div>
+        <div class="dim-desc">上瘾 vs 佛系</div>
+      </div>
+      <div class="dim">
+        <div class="dim-head">04 · 布道指数</div>
+        <div class="dim-poles">S<span class="slash">/</span>H</div>
+        <div class="dim-desc">开宗立派 vs 默默潜水</div>
+      </div>
+    </section>
+
+    <div class="meta-strip">
+      <span class="tag">⏱ 约 3 分钟</span>
+      <span class="tag">🎁 4 个彩蛋人设</span>
+      <span class="tag">🎲 随机抽题</span>
+      <span class="tag solid">娱乐向</span>
+    </div>
+
+    <!-- 续作提示（隐藏，JS 控制） -->
+    <div class="resume-banner hidden" id="resume-banner">
+      <span>发现未完成的测试（<strong id="resume-count">0 / 0</strong>）</span>
+      <span style="display:flex;gap:6px;">
+        <button id="resume-btn" type="button">继续</button>
+        <button id="resume-restart-btn" type="button" style="background:var(--bg);color:var(--ink);">重开</button>
+      </span>
+    </div>
+
+    <div class="cover-bottom">
+      <button class="btn primary" id="start-btn" type="button">开始测试 →</button>
+      <div class="disclaimer">本测试不收集任何个人信息</div>
+    </div>
+  </section>
+
+  <!-- ============ 答题页 ============ -->
+  <section class="screen" id="screen-quiz" aria-label="答题">
+    <header class="q-top">
+      <div class="q-topbar">
+        <button class="q-back" id="q-back" type="button" aria-label="上一题">‹</button>
+        <div class="q-count mono">
+          <span class="cur" id="q-cur">01</span> / <span id="q-total">28</span>
+        </div>
+        <span class="tag mono" id="q-dim-pill">P / W</span>
+      </div>
+      <div class="progress" role="progressbar" aria-label="答题进度">
+        <div class="progress-bar" id="progress-bar"></div>
+      </div>
+    </header>
+
+    <div class="q-body">
+      <div class="q-dim-tag mono" id="q-dim-tag">DIM · 调教流派</div>
+      <h2 class="q-title" id="q-title">题目加载中…</h2>
+
+      <div class="options" id="q-options"></div>
+    </div>
+
+    <footer class="q-foot"></footer>
+  </section>
+
+  <!-- ============ 结果页 ============ -->
+  <section class="screen result-screen" id="screen-result" aria-label="你的测试结果">
+    <header class="cover-top">
+      <span class="brand mono">AI.PERSONA / RESULT</span>
+      <span class="tag mono solid hidden" id="result-egg-tag">🥚 EGG</span>
+    </header>
+
+    <div class="result-hero">
+      <div class="result-label mono">你的人设代号</div>
+      <div class="result-code mono" id="result-code">
+        <span class="l1">P</span><span class="l2">C</span><span class="l3">I</span><span class="l4">S</span>
+      </div>
+      <h2 class="result-name" id="result-name">AI 驯兽师</h2>
+      <p class="result-tagline" id="result-tagline">精准投喂 · 步步审批 · 日均 300+ · 朋友圈布道</p>
+    </div>
+
+    <div class="result-card">
+      <div class="result-card-title">人设画像</div>
+      <p class="result-desc" id="result-desc">—</p>
+      <div class="stamp hidden" id="result-stamp">CERTIFIED · 极度罕见</div>
+    </div>
+
+    <div class="result-card" id="dim-card">
+      <div class="result-card-title" id="dim-card-title">四维度画像</div>
+      <div class="dim-bars" id="dim-bars"></div>
+    </div>
+
+    <div class="result-card">
+      <div class="result-card-title">代表语录</div>
+      <p class="result-quote" id="result-quote">—</p>
+    </div>
+
+    <div class="result-card hidden" id="compat-card">
+      <div class="result-card-title">高兼容人设</div>
+      <div class="compat-list" id="compat-list"></div>
+    </div>
+
+    <div class="actions">
+      <button class="btn primary" id="share-btn" type="button">分享我的人设 ↗</button>
+      <button class="btn outline" id="restart-btn" type="button">重新测试</button>
+      <button class="btn ghost" id="result-home-btn" type="button">返回首页</button>
+    </div>
+  </section>
+
+</main>
+
+<script src="assets/data.js"></script>
+<script src="assets/app.js"></script>
+
+</body>
+</html>
